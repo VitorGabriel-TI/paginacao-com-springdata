@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,38 +20,39 @@ public class SpringDataPaginationApplication {
 		SpringApplication.run(SpringDataPaginationApplication.class, args);
 	}
 
-	record Post(Long id, String content, String author) {
+}
+record Post(Long id, String content, String author) {
 
-	}
+}
 
-	interface PostRepository extends PagingAndSortingRepository<Post, Long>{
+interface PostRepository extends PagingAndSortingRepository<Post, Long>{
 
-	}
+}
 
-	class PostService {
-		PostRepository postRepository;
+@Service
+class PostService {
+	PostRepository postRepository;
 
 		
-		public PostService(PostRepository postRepository) {
-			this.postRepository = postRepository;
-		}
-
-
-		public Page<Post> listPosts(Pageable pageable){
-			return postRepository.findAll(pageable);
-		}
+	public PostService(PostRepository postRepository) {
+		this.postRepository = postRepository;
 	}
 
-	@RestController
-	@RequestMapping("/posts")
-	class PostController {
 
-		@Autowired
-		PostService postService;
+	public Page<Post> listPosts(Pageable pageable){
+		return postRepository.findAll(pageable);
+	}
+}
 
-		@GetMapping
-		public List<Post> listPosts(Pageable pageable){
-			return postService.listPosts(pageable).getContent();
-		}
+@RestController
+@RequestMapping("/posts")
+class PostController {
+
+	@Autowired
+	PostService postService;
+
+	@GetMapping
+	public List<Post> listPosts(Pageable pageable){
+		return postService.listPosts(pageable).getContent();
 	}
 }
